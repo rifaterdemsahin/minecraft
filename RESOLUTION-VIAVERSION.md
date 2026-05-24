@@ -23,10 +23,10 @@ ViaVersion is a plugin that allows newer clients to connect to older servers by 
 ### Quick Fix (Inside Container)
 
 ```bash
-# Download ViaVersion
+# Download ViaVersion (correct URL)
 cd /opt/minecraft/plugins
 wget -O ViaVersion.jar \
-  https://ci.viaversion.com/job/ViaVersion/lastSuccessfulBuild/artifact/target/ViaVersion.jar
+  https://ci.viaversion.com/job/ViaVersion/lastSuccessfulBuild/artifact/build/libs/ViaVersion-5.9.2-SNAPSHOT.jar
 
 # Set permissions
 chown minecraft:minecraft ViaVersion.jar

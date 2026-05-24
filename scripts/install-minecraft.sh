@@ -19,7 +19,9 @@
 set -euo pipefail
 
 # --- Configuration ---
-VERSION="${1:-1.21.4}"
+# Auto-detect latest Paper version if not specified
+LATEST_PAPER_VERSION=$(curl -s "https://api.papermc.io/v2/projects/paper" | jq -r '.versions | last')
+VERSION="${1:-${LATEST_PAPER_VERSION}}"
 SERVER_TYPE="${2:-Paper}"
 INSTALL_DIR="/opt/minecraft"
 SERVICE_USER="minecraft"
@@ -83,13 +85,25 @@ log_step "Downloading ${SERVER_TYPE} server v${VERSION}..."
 
 download_paper() {
     local version=$1
-    log_info "Fetching Paper build info..."
+    log_info "Fetching Paper build info for ${version}..."
+    
+    # Check if version exists
+    local available_versions
+    available_versions=$(curl -s "https://api.papermc.io/v2/projects/paper" | jq -r '.versions[]')
+    if ! echo "$available_versions" | grep -q "^${version}$"; then
+        log_error "Version ${version} not found in Paper builds."
+        log_info "Available versions:"
+        echo "$available_versions" | tail -n 5 | sed 's/^/  - /'
+        log_info "Run with latest version: ./install-minecraft.sh ${LATEST_PAPER_VERSION} Paper"
+        exit 1
+    fi
     
     BUILD=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${version}/builds" | \
         jq -r '.builds | map(select(.channel == "default")) | last | .build')
     
     if [[ -z "$BUILD" || "$BUILD" == "null" ]]; then
         log_error "Could not find Paper build for version ${version}."
+        log_info "Run with latest version: ./install-minecraft.sh ${LATEST_PAPER_VERSION} Paper"
         exit 1
     fi
     

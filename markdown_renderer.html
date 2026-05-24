@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
         .sidebar {
-            width: 280px;
+            width: 300px;
             background: #16213e;
             padding: 20px;
             border-right: 1px solid #0f3460;
@@ -26,51 +26,72 @@
             height: 100vh;
             overflow-y: auto;
         }
-        .sidebar h1 {
+        .sidebar-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #00d4aa;
+            margin-bottom: 15px;
+        }
+        .sidebar-header h1 {
             color: #00d4aa;
-            font-size: 1.3em;
+            font-size: 1.4em;
             margin-bottom: 5px;
         }
-        .sidebar .subtitle {
+        .sidebar-header .subtitle {
             color: #888;
+            font-size: 0.85em;
+        }
+        .sidebar-header .status {
+            display: inline-block;
+            background: #0d3328;
+            color: #00d4aa;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 0.8em;
-            margin-bottom: 20px;
+            margin-top: 8px;
+            font-weight: bold;
         }
         .sidebar h2 {
             color: #e94560;
-            font-size: 0.85em;
+            font-size: 0.8em;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin: 20px 0 10px;
-            padding-top: 10px;
+            padding-top: 12px;
             border-top: 1px solid #0f3460;
         }
         .sidebar a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #ccc;
             text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin: 2px 0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin: 3px 0;
             font-size: 0.9em;
             transition: all 0.2s;
         }
         .sidebar a:hover {
             background: #0f3460;
             color: #00d4aa;
+            transform: translateX(4px);
         }
         .sidebar a.active {
             background: #00d4aa;
             color: #1a1a2e;
             font-weight: bold;
         }
-        .sidebar a.external::after {
-            content: " ↗";
-            font-size: 0.8em;
-            opacity: 0.6;
+        .sidebar a .emoji {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+        .sidebar a.external .emoji {
+            opacity: 0.7;
         }
         .content {
-            margin-left: 280px;
+            margin-left: 300px;
             padding: 40px;
             max-width: 900px;
         }
@@ -136,34 +157,56 @@
 <body>
     <div class="layout">
         <nav class="sidebar">
-            <h1>Minecraft Server</h1>
-            <div class="subtitle">Proxmox LXC Docs</div>
+            <div class="sidebar-header">
+                <h1>🎮 Minecraft Server</h1>
+                <div class="subtitle">Proxmox LXC Container 102</div>
+                <div class="status">🟢 Online</div>
+            </div>
 
-            <h2>Dashboard</h2>
-            <a href="index.html" class="nav-link">Overview</a>
-            <a href="https://rifaterdemsahin.github.io/minecraft/" class="nav-link external" target="_blank">Live Site</a>
+            <h2>📊 Dashboard</h2>
+            <a href="index.html" class="nav-link">
+                <span class="emoji">🏠</span> Overview
+            </a>
+            <a href="markdown_renderer.html" class="nav-link active">
+                <span class="emoji">📖</span> Doc Viewer
+            </a>
 
-            <h2>Guides</h2>
-            <a href="?doc=README.md" class="nav-link">Quick Start</a>
-            <a href="?doc=NEXT-START.md" class="nav-link">Turn On Next Time</a>
-            <a href="?doc=AGENTS.md" class="nav-link">Architecture (AGENTS)</a>
+            <h2>🚀 Guides</h2>
+            <a href="?doc=README.md" class="nav-link">
+                <span class="emoji">🚀</span> Quick Start
+            </a>
+            <a href="?doc=NEXT-START.md" class="nav-link">
+                <span class="emoji">🔌</span> Turn On Next Time
+            </a>
+            <a href="?doc=AGENTS.md" class="nav-link">
+                <span class="emoji">🏗️</span> Architecture
+            </a>
 
-            <h2>Troubleshooting</h2>
-            <a href="?doc=FORMULA.md" class="nav-link">Formula</a>
-            <a href="?doc=RESOLUTION.md" class="nav-link">Missing Tools Fix</a>
-            <a href="?doc=RESOLUTION-PAPER-VERSION.md" class="nav-link">Paper Version Fix</a>
-            <a href="?doc=RESOLUTION-SERVER-STARTED.md" class="nav-link">Startup Success</a>
+            <h2>🔧 Troubleshooting</h2>
+            <a href="?doc=FORMULA.md" class="nav-link">
+                <span class="emoji">🧪</span> Formula
+            </a>
+            <a href="?doc=RESOLUTION.md" class="nav-link">
+                <span class="emoji">🔨</span> Missing Tools Fix
+            </a>
+            <a href="?doc=RESOLUTION-PAPER-VERSION.md" class="nav-link">
+                <span class="emoji">📦</span> Paper Version Fix
+            </a>
+            <a href="?doc=RESOLUTION-SERVER-STARTED.md" class="nav-link">
+                <span class="emoji">✅</span> Startup Success
+            </a>
 
-            <h2>Scripts</h2>
-            <a href="https://github.com/rifaterdemsahin/minecraft/tree/main/scripts" class="nav-link external" target="_blank">GitHub Scripts ↗</a>
-
-            <h2>External</h2>
-            <a href="https://github.com/rifaterdemsahin/minecraft" class="nav-link external" target="_blank">GitHub Repo ↗</a>
-            <a href="https://docs.papermc.io/" class="nav-link external" target="_blank">Paper Docs ↗</a>
+            <h2>📁 External</h2>
+            <a href="https://github.com/rifaterdemsahin/minecraft" class="nav-link external" target="_blank">
+                <span class="emoji">🐙</span> GitHub Repo
+            </a>
+            <a href="https://docs.papermc.io/" class="nav-link external" target="_blank">
+                <span class="emoji">📚</span> Paper Docs
+            </a>
         </nav>
 
         <main class="content" id="content">
-            <div class="loading">Loading documentation...</div>
+            <div class="loading">📚 Loading documentation...</div>
         </main>
     </div>
 
@@ -175,7 +218,7 @@
 
         async function loadDoc(filename) {
             const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading">Loading ' + filename + '...</div>';
+            content.innerHTML = '<div class="loading">📚 Loading ' + filename + '...</div>';
 
             try {
                 const response = await fetch(filename);
@@ -183,7 +226,7 @@
                 const text = await response.text();
                 content.innerHTML = marked.parse(text);
             } catch (err) {
-                content.innerHTML = '<div class="error"><h3>Error loading ' + filename + '</h3><p>' + err.message + '</p></div>';
+                content.innerHTML = '<div class="error"><h3>❌ Error loading ' + filename + '</h3><p>' + err.message + '</p></div>';
             }
         }
 
@@ -192,7 +235,8 @@
             const doc = params.get('doc') || 'README.md';
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === '?doc=' + doc || (doc === 'README.md' && link.getAttribute('href') === 'index.html')) {
+                const href = link.getAttribute('href');
+                if (href === '?doc=' + doc) {
                     link.classList.add('active');
                 }
             });
@@ -205,7 +249,7 @@
         if (DOCS.includes(doc)) {
             loadDoc(doc);
         } else {
-            document.getElementById('content').innerHTML = '<div class="error"><h3>Document not found</h3><p>Select a document from the menu.</p></div>';
+            document.getElementById('content').innerHTML = '<div class="error"><h3>❌ Document not found</h3><p>Select a document from the menu.</p></div>';
         }
 
         updateActiveLink();

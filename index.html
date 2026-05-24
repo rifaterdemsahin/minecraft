@@ -180,8 +180,46 @@
         </div>
 
         <div class="grid">
-            <div class="card">
-                <h2>Architecture</h2>
+        <div class="card">
+            <h2>Why This Server Exists</h2>
+            <p><strong>Purpose:</strong> Self-hosted Minecraft Java server for personal/family use, running on existing Proxmox infrastructure without cloud subscription costs.</p>
+            
+            <h3>Why Self-Host?</h3>
+            <table>
+                <tr><th>Reason</th><th>Explanation</th></tr>
+                <tr><td>💰 Cost</td><td>No monthly Realms subscription ($4-8/month). Uses existing Proxmox hardware.</td></tr>
+                <tr><td>🔒 Control</td><td>Full admin access, custom plugins, mod support, world backups on your schedule.</td></tr>
+                <tr><td>👥 Privacy</td><td>Your world data stays on your hardware. No third-party servers.</td></tr>
+                <tr><td>⚡ Performance</td><td>Dedicated resources (4GB RAM, 2 cores) vs shared Realms hosting.</td></tr>
+                <tr><td>🎓 Learning</td><td>Practice Linux admin, systemd, networking, automation, containerization.</td></tr>
+            </table>
+
+            <h3>Why Proxmox LXC?</h3>
+            <table>
+                <tr><th>Reason</th><th>Explanation</th></tr>
+                <tr><td>🖥️ Existing Lab</td><td>Proxmox already running for other VMs. Adding a container is free.</td></tr>
+                <tr><td>📦 Isolation</td><td>Container separates Minecraft from host system. Easy backup/restore.</td></tr>
+                <tr><td>🔄 Snapshots</td><td>Proxmox can snapshot entire container before risky updates.</td></tr>
+                <tr><td>⚡ Lightweight</td><td>LXC shares host kernel. Lower overhead than full VM.</td></tr>
+                <tr><td>🌐 Network</td><td>Bridge networking gives container its own IP on LAN.</td></tr>
+            </table>
+
+            <h3>Use Cases</h3>
+            <ul>
+                <li><strong>Family Gaming:</strong> Kids and parents build together on local network</li>
+                <li><strong>Friends Server:</strong> Port-forward or VPN for remote friends to join</li>
+                <li><strong>Redstone Lab:</strong> Test complex contraptions without lag</li>
+                <li><strong>Plugin Development:</strong> Test Paper/Spigot plugins locally</li>
+                <li><strong>Automation Practice:</strong> Learn systemd, bash, GitHub Actions, infrastructure-as-code</li>
+            </ul>
+
+            <div class="highlight success">
+                <strong>Server Address:</strong> <code>192.168.0.236:25565</code> — Connect from any device on your LAN
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Architecture</h2>
                 <pre>
 Proxmox VE Host (proxmox.rifaterdemsahin.com)
 ├── LXC Container 102 (Debian 12)
@@ -279,13 +317,13 @@ ss -tlnp | grep 25565</pre>
             <h2>Where to Look for Help</h2>
             <table>
                 <tr><th>Document</th><th>Purpose</th></tr>
-                <tr><td><a href="AGENTS.md">AGENTS.md</a></td><td>Full architecture, all scripts, troubleshooting table, lessons learned</td></tr>
-                <tr><td><a href="FORMULA.md">FORMULA.md</a></td><td>Diagnosis checklist, common errors, log locations, recovery steps</td></tr>
-                <tr><td><a href="RESOLUTION.md">RESOLUTION.md</a></td><td>Missing tools fix (git/curl/jq), manual install fallback</td></tr>
-                <tr><td><a href="RESOLUTION-PAPER-VERSION.md">RESOLUTION-PAPER-VERSION.md</a></td><td>Paper version mismatch fix (1.21.4 → 1.21.11)</td></tr>
-                <tr><td><a href="RESOLUTION-SERVER-STARTED.md">RESOLUTION-SERVER-STARTED.md</a></td><td>Startup success reference, connection details</td></tr>
-                <tr><td><a href="NEXT-START.md">NEXT-START.md</a></td><td>Detailed turn-on procedure, auto-start checklist</td></tr>
-                <tr><td><a href="README.md">README.md</a></td><td>Quick-start and management reference</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=AGENTS.md">AGENTS.md</a></td><td>Full architecture, all scripts, troubleshooting table, lessons learned</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=FORMULA.md">FORMULA.md</a></td><td>Diagnosis checklist, common errors, log locations, recovery steps</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=RESOLUTION.md">RESOLUTION.md</a></td><td>Missing tools fix (git/curl/jq), manual install fallback</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=RESOLUTION-PAPER-VERSION.md">RESOLUTION-PAPER-VERSION.md</a></td><td>Paper version mismatch fix (1.21.4 → 1.21.11)</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=RESOLUTION-SERVER-STARTED.md">RESOLUTION-SERVER-STARTED.md</a></td><td>Startup success reference, connection details</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=NEXT-START.md">NEXT-START.md</a></td><td>Detailed turn-on procedure, auto-start checklist</td></tr>
+                <tr><td><a href="markdown_renderer.html?doc=README.md">README.md</a></td><td>Quick-start and management reference</td></tr>
             </table>
         </div>
 

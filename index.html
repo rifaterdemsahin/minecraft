@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            color: #00d4aa;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+        }
+        .status-bar {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .status-item {
+            text-align: center;
+        }
+        .status-label {
+            font-size: 0.85em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+        .status-value.offline { color: #e74c3c; }
+        .card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            color: #00d4aa;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .card h3 {
+            color: #e94560;
+            margin: 20px 0 10px;
+            font-size: 1.1em;
+        }
+        pre {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+        code {
+            background: #0f3460;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #0f3460;
+        }
+        th {
+            color: #00d4aa;
+            font-weight: 600;
+        }
+        .highlight {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #00d4aa;
+        }
+        .warning {
+            border-left-color: #e94560;
+            background: #2d132c;
+        }
+        .success {
+            border-left-color: #00d4aa;
+            background: #0d3328;
+        }
+        a {
+            color: #00d4aa;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            text-align: center;
+            color: #888;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #0f3460;
+        }
+        .step {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: #00d4aa;
+            color: #1a1a2e;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minecraft Server Dashboard</h1>
+        <p class="subtitle">Proxmox LXC Container 102 — Paper 1.21.11</p>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">Status</div>
+                <div class="status-value">Online</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Version</div>
+                <div class="status-value">1.21.11</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Build</div>
+                <div class="status-value">69</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Address</div>
+                <div class="status-value">192.168.0.236:25565</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Auto-Start</div>
+                <div class="status-value">Enabled</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Architecture</h2>
+                <pre>
+Proxmox VE Host (proxmox.rifaterdemsahin.com)
+├── LXC Container 102 (Debian 12)
+│   ├── systemd: minecraft.service
+│   ├── /opt/minecraft/
+│   │   ├── server.jar (Paper 1.21.11-69)
+│   │   ├── server.properties
+│   │   ├── eula.txt (accepted)
+│   │   ├── world/ (generated)
+│   │   ├── world_nether/
+│   │   ├── world_the_end/
+│   │   ├── logs/
+│   │   └── scripts/ (this repo)
+│   └── Java 21 (Eclipse Temurin)
+└── Network: vmbr0 (DHCP)
+    └── Ports: 25565, 25575, 22
+                </pre>
+            </div>
+
+            <div class="card">
+                <h2>Container Specs</h2>
+                <table>
+                    <tr><th>Property</th><th>Value</th></tr>
+                    <tr><td>CTID</td><td>102</td></tr>
+                    <tr><td>OS</td><td>Debian 12 (bookworm)</td></tr>
+                    <tr><td>Hostname</td><td>minecraft-server</td></tr>
+                    <tr><td>IP</td><td>192.168.0.236</td></tr>
+                    <tr><td>MAC</td><td>BC:24:11:BC:32:41</td></tr>
+                    <tr><td>RAM</td><td>4096 MB (4GB)</td></tr>
+                    <tr><td>Disk</td><td>8GB</td></tr>
+                    <tr><td>Cores</td><td>2</td></tr>
+                    <tr><td>Swap</td><td>512MB</td></tr>
+                    <tr><td>JVM Heap</td><td>3GB (auto-detected)</td></tr>
+                    <tr><td>Unprivileged</td><td>Yes</td></tr>
+                    <tr><td>Nesting</td><td>Enabled</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Turn On Next Time</h2>
+            <p>After Proxmox host reboot or container shutdown:</p>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Start Container on Proxmox Host</strong>
+                    <pre>ssh root@workstation
+pct start 102
+pct status 102</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Wait 30 Seconds for Boot</strong>
+                    <p>The container needs time to initialize network and services.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>Verify Minecraft Auto-Started</strong>
+                    <pre>pct exec 102 -- bash
+systemctl status minecraft --no-pager
+ss -tlnp | grep 25565</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <strong>Run Full Test Suite (Optional)</strong>
+                    <pre>cd /opt/minecraft/scripts
+./test-boot.sh</pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <strong>Connect with Minecraft Java</strong>
+                    <p>Server Address: <code>192.168.0.236:25565</code></p>
+                </div>
+            </div>
+
+            <div class="highlight success">
+                <strong>Quick Version:</strong> <code>pct start 102</code> then wait 30s. The server starts automatically.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Where to Look for Help</h2>
+            <table>
+                <tr><th>Document</th><th>Purpose</th></tr>
+                <tr><td><a href="AGENTS.md">AGENTS.md</a></td><td>Full architecture, all scripts, troubleshooting table, lessons learned</td></tr>
+                <tr><td><a href="FORMULA.md">FORMULA.md</a></td><td>Diagnosis checklist, common errors, log locations, recovery steps</td></tr>
+                <tr><td><a href="RESOLUTION.md">RESOLUTION.md</a></td><td>Missing tools fix (git/curl/jq), manual install fallback</td></tr>
+                <tr><td><a href="RESOLUTION-PAPER-VERSION.md">RESOLUTION-PAPER-VERSION.md</a></td><td>Paper version mismatch fix (1.21.4 → 1.21.11)</td></tr>
+                <tr><td><a href="RESOLUTION-SERVER-STARTED.md">RESOLUTION-SERVER-STARTED.md</a></td><td>Startup success reference, connection details</td></tr>
+                <tr><td><a href="NEXT-START.md">NEXT-START.md</a></td><td>Detailed turn-on procedure, auto-start checklist</td></tr>
+                <tr><td><a href="README.md">README.md</a></td><td>Quick-start and management reference</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Lessons Learned</h2>
+            <div class="highlight warning">
+                <strong>Paper 1.21.4 is no longer available.</strong> The API returns no builds. Always use the latest version or omit the version argument.
+            </div>
+            <div class="highlight warning">
+                <strong>Debian 12 minimal images lack basic tools.</strong> <code>git</code>, <code>curl</code>, <code>wget</code>, <code>jq</code> must be installed manually with <code>apt-get</code>.
+            </div>
+            <div class="highlight warning">
+                <strong>Container 102 uses Debian, not Ubuntu.</strong> The <code>proxmox-lxc-setup.sh</code> template was not used; container was created differently.
+            </div>
+            <div class="highlight warning">
+                <strong>Password SSH is disabled.</strong> Container only accepts keys. Use <code>pct exec 102 -- bash</code> or Proxmox console.
+            </div>
+            <div class="highlight">
+                <strong>First startup takes ~50 seconds.</strong> Paper remaps obfuscated code on first run. This is normal behavior.
+            </div>
+            <div class="highlight">
+                <strong>Auto-start requires two levels:</strong> <code>systemctl enable minecraft</code> (inside container) AND <code>pct set 102 --onboot 1</code> (on Proxmox host).
+            </div>
+            <div class="highlight">
+                <strong>JVM heap auto-detects from container RAM.</strong> Formula: <code>(total_MB - 1024) / 1024</code> with 1GB minimum.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Quick Commands</h2>
+            <table>
+                <tr><th>Action</th><th>Command</th></tr>
+                <tr><td>Start server</td><td><code>systemctl start minecraft</code></td></tr>
+                <tr><td>Stop server</td><td><code>systemctl stop minecraft</code></td></tr>
+                <tr><td>Restart server</td><td><code>systemctl restart minecraft</code></td></tr>
+                <tr><td>View status</td><td><code>systemctl status minecraft</code></td></tr>
+                <tr><td>Live logs</td><td><code>journalctl -u minecraft -f</code></td></tr>
+                <tr><td>Recent logs</td><td><code>journalctl -u minecraft --no-pager -n 20</code></td></tr>
+                <tr><td>Game logs</td><td><code>tail -f /opt/minecraft/logs/latest.log</code></td></tr>
+                <tr><td>Backup world</td><td><code>./manage-minecraft.sh backup</code></td></tr>
+                <tr><td>Check port</td><td><code>ss -tlnp | grep 25565</code></td></tr>
+                <tr><td>Full health test</td><td><code>./test-boot.sh</code></td></tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Last updated: 2026-05-24 | <a href="https://github.com/rifaterdemsahin/minecraft">GitHub Repository</a></p>
+        </div>
+    </div>
+</body>
+</html>

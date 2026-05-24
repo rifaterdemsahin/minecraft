@@ -19,11 +19,19 @@
 
 set -euo pipefail
 
+# --- Load .env if present ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="${SCRIPT_DIR}/../.env"
+if [[ -f "$ENV_FILE" ]]; then
+    # shellcheck source=/dev/null
+    source "$ENV_FILE"
+fi
+
 # --- Configuration ---
-CTID="${1:-9999}"
-HOSTNAME="${2:-minecraft-server}"
-MEMORY_MB="${3:-8192}"
-DISK_GB="${4:-32}"
+CTID="${1:-${DEFAULT_CTID:-100}}"
+HOSTNAME="${2:-${DEFAULT_HOSTNAME:-minecraft-server}}"
+MEMORY_MB="${3:-${DEFAULT_MEMORY_MB:-8192}}"
+DISK_GB="${4:-${DEFAULT_DISK_GB:-32}}"
 STORAGE="local-lvm"           # Adjust to your Proxmox storage (local-lvm, local-zfs, etc.)
 OS_TEMPLATE="ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
 TEMPLATE_STORAGE="local"
@@ -203,6 +211,9 @@ echo "  Root Pass:   $ROOT_PASSWORD"
 echo "  RAM:         ${MEMORY_MB}MB"
 echo "  Disk:        ${DISK_GB}GB"
 echo ""
+echo "  Proxmox Host: ${PROXMOX_HOST:-proxmox.rifaterdemsahin.com}"
+echo "  Proxmox User: ${PROXMOX_USERNAME:-root}"
+echo ""
 echo "  Next Steps:"
 echo "  1. SSH into the container: ssh root@$IP"
 echo "  2. Clone this repo: git clone git@github.com:rifaterdemsahin/minecraft.git /opt/minecraft/scripts"
@@ -219,5 +230,18 @@ IP Address:   $IP
 Root Password: $ROOT_PASSWORD
 SSH Command:  ssh root@$IP
 EOF
+
+# Also save to keyvault if available
+if command -v secret-tool &>/dev/null || command -v security &>/dev/null; then
+    log_info "Saving credentials to system keyvault..."
+    # macOS Keychain
+    if command -v security &>/dev/null; then
+        security add-generic-password -s "proxmox-minecraft-${CTID}" -a "root" -w "$ROOT_PASSWORD" -U 2>/dev/null || true
+    fi
+    # Linux Secret Service
+    if command -v secret-tool &>/dev/null; then
+        echo "$ROOT_PASSWORD" | secret-tool store --label="Proxmox Minecraft ${CTID}" service proxmox-minecraft username root 2>/dev/null || true
+    fi
+fi
 
 log_info "Credentials saved to: proxmox-credentials-${CTID}.txt"

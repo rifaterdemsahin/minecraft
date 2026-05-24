@@ -77,6 +77,96 @@ sleep 90
 journalctl -u minecraft --no-pager | tail -20 | grep -i "gamemode\|loaded"
 ```
 
+**Expected output:**
+```
+Default game type: CREATIVE
+Done preparing level "world" (1.021s)
+Done (41.591s)! For help, type "help"
+```
+
+---
+
+## Step 6: Verify in Game
+
+When Mira and Arya connect, they should see:
+- ✅ **Creative Mode** inventory (access all blocks)
+- ✅ **Flight enabled** (double-tap jump)
+- ✅ **No fall damage or hunger**
+
+**Verify from server logs:**
+```bash
+journalctl -u minecraft --no-pager | grep -i "player connected\|creative"
+```
+
+---
+
+## Troubleshooting Connection Issues
+
+If players can't connect after switching to Creative:
+
+### Check Server is Running
+```bash
+ps aux | grep java | grep -v grep
+ss -tlnp | grep 25565
+systemctl is-active minecraft
+```
+
+### Check for Startup Errors
+```bash
+journalctl -u minecraft --no-pager | tail -50 | grep -i "error\|exception\|failed"
+```
+
+### Check Geyser (Bedrock/iPad)
+```bash
+ss -ulnp | grep 19132
+journalctl -u minecraft --no-pager | grep -i "geyser\|started geyser"
+```
+
+### Common Fixes
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| "Connection timed out" | Firewall blocking | `ufw allow 25565/tcp && ufw allow 19132/udp` |
+| "Connection refused" | Server not running | `systemctl start minecraft` |
+| "Outdated server" | Version mismatch | Verify ViaVersion is loaded: `journalctl -u minecraft \| grep ViaVersion` |
+| Can't break blocks at spawn | Spawn protection | Set `spawn-protection=0` in `server.properties` |
+| World won't load | Corruption from gamemode change | Restore backup: `mv world-survival-backup world` |
+
+### If World is Corrupted
+```bash
+# Stop server
+systemctl stop minecraft
+
+# Remove corrupted world
+rm -rf /opt/minecraft/world
+
+# Restore from backup
+mv /opt/minecraft/world-survival-backup /opt/minecraft/world
+
+# Or let it generate fresh (delete world folder, no backup)
+# rm -rf /opt/minecraft/world
+
+# Restart
+systemctl start minecraft
+```
+
+---
+
+## Quick Command (If Already Running)
+
+You can also change gamemode **without restarting** using in-game commands:
+
+```bash
+# Via server console (if you have console access)
+gamemode creative @a
+```
+
+Or via server console:
+```bash
+# Send command through screen or console
+screen -S minecraft -p 0 -X stuff "gamemode creative @a$(printf \r)"
+```
+
 ---
 
 ## Step 6: Verify in Game

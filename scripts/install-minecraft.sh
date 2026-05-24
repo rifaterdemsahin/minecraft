@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Minecraft Server Installation Script
+# Minecraft Server Installation Script (No-Git Fallback)
 # =============================================================================
 # This script installs and configures the Minecraft Java server.
-# Run this INSIDE the Proxmox LXC container (or any Ubuntu/Debian VM).
+# Run this INSIDE the Proxmox LXC container (or any Debian/Ubuntu VM).
 #
 # Usage:
 #   ./scripts/install-minecraft.sh [VERSION] [SERVER_TYPE]
@@ -13,18 +13,18 @@
 #   SERVER_TYPE : Paper | Vanilla | Forge | Fabric (default: Paper)
 #
 # Example:
-#   ./scripts/install-minecraft.sh 1.21.4 Paper
+#   ./install-minecraft.sh 1.21.4 Paper
 # =============================================================================
 
 set -euo pipefail
 
 # --- Configuration ---
 VERSION="${1:-1.21.4}"
-SERVER_TYPE="${2:-Paper}"          # Paper, Vanilla, Forge, Fabric
+SERVER_TYPE="${2:-Paper}"
 INSTALL_DIR="/opt/minecraft"
 SERVICE_USER="minecraft"
 SERVICE_GROUP="minecraft"
-EULA_ACCEPT="true"                 # Set to "true" to accept Mojang EULA automatically
+EULA_ACCEPT="true"
 
 # Colors
 RED='\033[0;31m'
@@ -48,11 +48,18 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# Ensure required tools are installed
+if ! command -v curl &>/dev/null || ! command -v wget &>/dev/null || ! command -v jq &>/dev/null; then
+    log_warn "Installing required tools (curl, wget, jq)..."
+    apt-get update -qq
+    apt-get install -y -qq curl wget jq
+fi
+
 # Ensure Java 21 is installed
 if ! java -version 2>&1 | grep -q "openjdk version \"21"; then
     log_warn "Java 21 not detected. Installing..."
     apt-get update -qq
-    apt-get install -y -qq openjdk-21-jre-headless openjdk-21-jdk-headless curl wget jq git
+    apt-get install -y -qq openjdk-21-jre-headless openjdk-21-jdk-headless
 fi
 
 JAVA_VERSION=$(java -version 2>&1 | head -n1 | cut -d'"' -f2)
@@ -78,7 +85,6 @@ download_paper() {
     local version=$1
     log_info "Fetching Paper build info..."
     
-    # Get latest build number for the version
     BUILD=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${version}/builds" | \
         jq -r '.builds | map(select(.channel == "default")) | last | .build')
     
@@ -262,8 +268,8 @@ cat > "${INSTALL_DIR}/jvm-args.txt" << 'EOF'
 # Recommended JVM arguments for Paper/Modern Minecraft Servers
 # Adjust -Xms and -Xmx based on available RAM
 
--Xms6G
--Xmx6G
+-Xms2G
+-Xmx2G
 -XX:+UseG1GC
 -XX:+UnlockExperimentalVMOptions
 -XX:MaxGCPauseMillis=100
@@ -289,6 +295,12 @@ cat > "${INSTALL_DIR}/whitelist.json" << 'EOF'
 ]
 EOF
 
+# Save install info for updates
+cat > "${INSTALL_DIR}/.install-info" << EOF
+VERSION=${VERSION}
+SERVER_TYPE=${SERVER_TYPE}
+EOF
+
 # Set permissions
 chown -R "${SERVICE_USER}:${SERVICE_GROUP}" "$INSTALL_DIR"
 chmod +x server.jar 2>/dev/null || true
@@ -297,6 +309,14 @@ chmod +x server.jar 2>/dev/null || true
 # Systemd Service Update
 # =============================================================================
 log_step "Updating systemd service..."
+
+# Detect container memory and set JVM heap accordingly (leave 1GB for OS)
+TOTAL_MEM_MB=$(free -m | awk '/^Mem:/{print $2}')
+HEAP_MB=$((TOTAL_MEM_MB - 1024))
+if [[ $HEAP_MB -lt 1024 ]]; then HEAP_MB=1024; fi
+HEAP_G=$(( (HEAP_MB + 1023) / 1024 ))
+
+log_info "Detected ${TOTAL_MEM_MB}MB RAM. Setting JVM heap to ${HEAP_G}G."
 
 cat > /etc/systemd/system/minecraft.service << EOF
 [Unit]
@@ -308,7 +328,7 @@ Type=simple
 User=${SERVICE_USER}
 Group=${SERVICE_GROUP}
 WorkingDirectory=${INSTALL_DIR}
-ExecStart=/usr/bin/java -Xms6G -Xmx6G -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=100 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:G1MixedGCLiveThresholdPercent=50 -XX:+AlwaysPreTouch -jar server.jar nogui
+ExecStart=/usr/bin/java -Xms${HEAP_G}G -Xmx${HEAP_G}G -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=100 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:G1MixedGCLiveThresholdPercent=50 -XX:+AlwaysPreTouch -jar server.jar nogui
 Restart=on-failure
 RestartSec=10
 StandardOutput=append:${INSTALL_DIR}/logs/latest.log
@@ -327,10 +347,12 @@ systemctl enable minecraft.service
 log_step "Configuring firewall..."
 
 if command -v ufw &>/dev/null; then
-    ufw allow 25565/tcp comment "Minecraft Server"
-    ufw allow 25575/tcp comment "Minecraft RCON"
-    ufw reload
+    ufw allow 25565/tcp comment "Minecraft Server" 2>/dev/null || true
+    ufw allow 25575/tcp comment "Minecraft RCON" 2>/dev/null || true
+    ufw reload 2>/dev/null || true
     log_info "UFW rules applied."
+else
+    log_warn "UFW not installed. Install with: apt-get install ufw"
 fi
 
 # =============================================================================
@@ -354,19 +376,21 @@ echo "  Type:        ${SERVER_TYPE}"
 echo "  Directory:   ${INSTALL_DIR}"
 echo "  User:        ${SERVICE_USER}"
 echo "  Service:     minecraft.service"
+echo "  JVM Heap:    ${HEAP_G}G (auto-detected from ${TOTAL_MEM_MB}MB RAM)"
 echo ""
 echo "  Quick Commands:"
 echo "  Start:       systemctl start minecraft"
 echo "  Stop:        systemctl stop minecraft"
 echo "  Status:      systemctl status minecraft"
 echo "  Logs:        journalctl -u minecraft -f"
-echo "  Console:     screen -r minecraft (if using screen)"
+echo "  Console:     tail -f ${INSTALL_DIR}/logs/latest.log"
 echo ""
 echo "  Edit config: nano ${INSTALL_DIR}/server.properties"
 echo "  EULA Status: ${EULA_ACCEPT}"
 echo ""
 echo "  Next Step:"
-echo "  Run: ./scripts/test-minecraft.sh to validate"
+echo "  Run: systemctl start minecraft"
+echo "  Then: ${INSTALL_DIR}/scripts/test-minecraft.sh (if available)"
 echo "========================================"
 echo ""
 

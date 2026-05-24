@@ -226,6 +226,83 @@ Once connected, you can:
 
 ---
 
+## ❌ iPad Error: "InitialConnection-13" (NetherNet)
+
+If your kid is on an **iPad** and sees this error:
+
+```
+NetherNet
+"Your client is having trouble establishing a connection 
+to multiplayer server services"
+
+Error Detail: InitialConnection-13
+Version: 1.26.21-iPad14.2
+WorldName: Mira and Arya
+```
+
+### ⚠️ The Real Problem
+
+This is a **Minecraft Bedrock (iPad)** error. The server we built is **Java Edition**.
+
+| Edition | Devices | Can Connect? |
+|---------|---------|-------------|
+| **Java** | Windows, Mac, Linux | ✅ Yes — this server |
+| **Bedrock** | iPad, iPhone, Xbox, Switch, Android | ❌ No — different protocol |
+
+**Java and Bedrock cannot play together.** Your kid needs Minecraft **Java Edition** on a computer.
+
+### How to Fix
+
+**Option 1: Get Java Edition (Recommended)**
+- Buy Minecraft Java Edition for PC/Mac
+- Log in with Microsoft account
+- Add server: `192.168.0.236:25565`
+- Works perfectly with this server
+
+**Option 2: Run Bedrock-Compatible Server (Geyser)**
+If you want iPad to connect, install GeyserMC:
+```bash
+# Inside container
+cd /opt/minecraft
+wget https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+# Configure Geyser to listen on port 19132
+# Restart server
+```
+Then iPad connects to `192.168.0.236:19132`
+
+**Option 3: Use Minecraft Realms**
+- Pay $4-8/month for official Bedrock Realms
+- Works with iPad, Xbox, Switch, Phone
+- No server setup needed
+
+### iPad-Only Fixes (If Already on Correct Server Type)
+
+If the error happens on a **Bedrock-compatible** server:
+
+| Fix | Steps |
+|-----|-------|
+| **Force close app** | Swipe up, close Minecraft, wait 10s, reopen |
+| **Toggle WiFi** | Airplane mode ON 5s, then OFF |
+| **Check world host** | If joining "Mira and Arya", the host must be online |
+| **Update Minecraft** | App Store → Updates → Minecraft |
+| **Clear cache** | Settings → General → iPad Storage → Minecraft → Offload App → Reinstall |
+| **Restart iPad** | Hold power button, slide to power off, turn on |
+
+### What "InitialConnection-13" Means
+
+| Code | Meaning |
+|------|---------|
+| `InitialConnection` | Failed at the very first network handshake |
+| `-13` | Specific sub-error: likely network timeout or auth failure |
+
+Common causes:
+- WiFi blocking local connections (guest network)
+- Minecraft auth servers down
+- World host offline (for peer-to-peer worlds)
+- Firewall blocking port 19132 (Bedrock default)
+
+---
+
 ## Still Not Working?
 
 Check these documents:

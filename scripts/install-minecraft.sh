@@ -98,8 +98,14 @@ download_paper() {
         exit 1
     fi
     
+    # Try default channel first, fallback to any available build
     BUILD=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${version}/builds" | \
         jq -r '.builds | map(select(.channel == "default")) | last | .build')
+    
+    if [[ -z "$BUILD" || "$BUILD" == "null" ]]; then
+        BUILD=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${version}/builds" | \
+            jq -r '.builds | last | .build')
+    fi
     
     if [[ -z "$BUILD" || "$BUILD" == "null" ]]; then
         log_error "Could not find Paper build for version ${version}."

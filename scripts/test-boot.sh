@@ -207,7 +207,7 @@ test_boot_persistence() {
     fi
     
     # Check container onboot setting (Proxmox)
-    if [[ -f /proc/1/environ ]] && strings /proc/1/environ | grep -q "container"; then
+    if [[ -f /proc/1/environ ]] && tr '\0' '\n' < /proc/1/environ | grep -q "container"; then
         log_info "Running inside container. Ensure Proxmox 'onboot' is enabled."
         log_info "On Proxmox host: pct config 102 | grep onboot"
     fi

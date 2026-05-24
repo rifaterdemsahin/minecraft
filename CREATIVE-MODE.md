@@ -84,6 +84,19 @@ Done preparing level "world" (1.021s)
 Done (41.591s)! For help, type "help"
 ```
 
+**Full verification:**
+```bash
+ps aux | grep java | grep -v grep
+ss -tlnp | grep 25565
+journalctl -u minecraft --no-pager | tail -50 | grep -i "error\|exception\|failed"
+```
+
+**Expected:**
+```
+minecra+  3065  0.0 56.6 6063888 2375692 ?  Ssl  22:20  1:30 /usr/bin/java -Xms3G -Xmx3G -jar server.jar nogui
+LISTEN 0  4096  *:25565  *:*  users:(("java",pid=3065,fd=141))
+```
+
 ---
 
 ## Step 6: Verify in Game
@@ -96,6 +109,23 @@ When Mira and Arya connect, they should see:
 **Verify from server logs:**
 ```bash
 journalctl -u minecraft --no-pager | grep -i "player connected\|creative"
+```
+
+**Expected output when player joins:**
+```
+[Geyser-Spigot] Player connected with username TabooBasil1922 (975)
+[Geyser-Spigot] TabooBasil1922 (logged in as: TabooBasil1922) has connected to the Java server
+[floodgate] Floodgate player logged in as .TabooBasil1922 joined (UUID: 00000000-0000-0000-0009-01f6559eda36)
+.TabooBasil1922 joined the game
+.TabooBasil1922[/192.168.0.81:0] logged in with entity id 96 at ([world]-421.69998, 68.00001, 282.6708)
+```
+
+**Player disconnect:**
+```
+[Geyser-Spigot] TabooBasil1922 has disconnected from the Java server because of Bedrock client disconnected
+[floodgate] Floodgate player logged in as .TabooBasil1922 disconnected
+.TabooBasil1922 lost connection: Disconnected
+.TabooBasil1922 left the game
 ```
 
 ---

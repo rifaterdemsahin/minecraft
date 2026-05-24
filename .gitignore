@@ -1,0 +1,28 @@
+# Credentials and secrets
+proxmox-credentials-*.txt
+.env
+*.pem
+*.key
+
+# Minecraft server files (if running in repo)
+server.jar
+*.jar
+world/
+world_nether/
+world_the_end/
+logs/
+crash-reports/
+backups/
+plugins/
+mods/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
